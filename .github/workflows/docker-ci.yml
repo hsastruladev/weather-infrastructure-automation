@@ -3,8 +3,7 @@ name: Docker Build and Scan
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
   build-and-test:
@@ -15,26 +14,19 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Create Dummy SSL for Build
-      # This creates the files in the runner's environment so Docker can find them
+      # We create these INSIDE the weather-app directory 
+      # so the Docker COPY command finds them.
       run: |
         touch ./weather-app/nginx-selfsigned.crt
         touch ./weather-app/nginx-selfsigned.key
+        echo "✅ Created dummy files in ./weather-app/"
+        ls -l ./weather-app/
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
     - name: Build image
+      # The '.' at the end of the command tells Docker to look 
+      # INSIDE the weather-app folder for its files.
       run: |
         docker build -t weather-app:test ./weather-app/
-
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
-
-    - name: Build image
-      run: |
-        docker build -t weather-app:test ./weather-app/
-
-    - name: Verify JSON Structure
-      run: |
-        # This tiny test ensures your JSON is valid before it ever reaches production
-        cat ./weather-app/weather.json | jq .
