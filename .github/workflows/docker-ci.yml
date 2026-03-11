@@ -1,34 +1,25 @@
-name: Docker Build and Scan
-
-on:
-  push:
-    branches: [ "main" ]
-  workflow_dispatch:
-
-jobs:
-  build-and-test:
-    runs-on: ubuntu-latest
-    
-    steps:
+steps:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Create Dummy SSL for Build
+    - name: Debug and Create Files
       run: |
-        # 1. Create the files exactly where Dockerfile is
-        touch ./weather-app/nginx-selfsigned.crt
-        touch ./weather-app/nginx-selfsigned.key
+        # Ensure the directory exists (just in case)
+        mkdir -p weather-app
         
-        # 2. DEBUG: Show us exactly what is in the folder
-        echo "Current Directory: $(pwd)"
-        echo "Contents of weather-app folder:"
-        ls -la ./weather-app/
+        # Create the dummy files
+        touch weather-app/nginx-selfsigned.crt
+        touch weather-app/nginx-selfsigned.key
+        
+        echo "--- ROOT DIRECTORY ---"
+        ls -F
+        echo "--- WEATHER-APP DIRECTORY ---"
+        ls -F weather-app/
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
     - name: Build image
       run: |
-        # We target the folder. Docker will look for nginx-selfsigned.key 
-        # INSIDE ./weather-app/
-        docker build -t weather-app:test ./weather-app/
+        # We use the relative path to the folder containing the Dockerfile
+        docker build -t weather-app:test ./weather-app
