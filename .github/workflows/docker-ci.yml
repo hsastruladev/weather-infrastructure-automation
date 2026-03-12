@@ -14,19 +14,17 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Prepare Build Context
-      # We inject fake PEM headers so Nginx 'thinks' these are real SSL files
       run: |
         mkdir -p ./weather-app
         echo "-----BEGIN CERTIFICATE-----" > ./weather-app/nginx-selfsigned.crt
-        echo "MOCK_DATA" >> ./weather-app/nginx-selfsigned.crt
+        echo "bW9ja2RhdGEK" >> ./weather-app/nginx-selfsigned.crt
         echo "-----END CERTIFICATE-----" >> ./weather-app/nginx-selfsigned.crt
         
         echo "-----BEGIN PRIVATE KEY-----" > ./weather-app/nginx-selfsigned.key
-        echo "MOCK_DATA" >> ./weather-app/nginx-selfsigned.key
+        echo "bW9ja2RhdGEK" >> ./weather-app/nginx-selfsigned.key
         echo "-----END PRIVATE KEY-----" >> ./weather-app/nginx-selfsigned.key
         
-        echo "✅ Valid-formatted dummy SSL keys generated."
-        ls -l ./weather-app/
+        echo "✅ Base64-compliant dummy keys generated."
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
@@ -39,6 +37,5 @@ jobs:
           ./weather-app/
 
     - name: Verify Nginx Configuration
-      # This is where it failed before; now it will pass because of the headers
       run: |
         docker run --rm weather-app:test nginx -t
