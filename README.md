@@ -1,0 +1,1 @@
+[![Docker Build and Scan](https://github.com/hsastruladev/weather-infrastructure-automation/actions/workflows/docker-ci.yml/badge.svg)](https://github.com/hsastruladev/weather-infrastructure-automation/actions/workflows/docker-ci.yml)
